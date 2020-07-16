@@ -3,12 +3,11 @@
 </template>
 
 <script>
-import axios from 'axios'
 export default {
   name: 'home',
   async mounted() {
     console.log(1)
-    await axios.get('categories/6')
+    await this.$axios.get('categories/6')
   }
 }
 </script>

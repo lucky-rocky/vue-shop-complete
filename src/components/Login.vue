@@ -5,23 +5,19 @@
       <div class="login-avatar">
         <img src="../assets/不知火.jpg" />
       </div>
-      <el-form ref="form" label-width="0px" id="login-form">
+      <el-form ref="formRef" label-width="0px" id="login-form" :rules="rules" :model="form">
         <!-- 用户名 -->
-        <el-form-item class="user">
-          <el-input placeholder="请输入用户名" v-model="form.username"></el-input>
+        <el-form-item class="user" prop="username">
+          <el-input placeholder="请输入用户名" v-model="form.username" prefix-icon="iconfont icon-user"></el-input>
         </el-form-item>
         <!-- 密码 -->
-        <el-form-item class="pwd">
-          <el-input type="password" placeholder="请输入密码" v-model="form.password" @blur="sub_handle"></el-input>
+        <el-form-item class="pwd" prop="password">
+          <el-input type="password" placeholder="请输入密码" v-model="form.password" prefix-icon="iconfont icon-3702mima"></el-input>
         </el-form-item>
         <!-- 按钮部分 -->
         <el-form-item class="button">
           <el-button type="info" class="resetbtn" @click="reset_handle">重置</el-button>
           <el-button type="primary" class="loginbtn" @click="sub_handle">登录</el-button>
-        </el-form-item>
-        <el-form-item class="login-msg">
-          <el-button :plain="true" @click="open2">成功</el-button>
-          <el-button :plain="true" @click="open4">错误</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -29,50 +25,47 @@
 </template>
 
 <script>
-import axios from 'axios'
 export default {
   name: 'login',
   data() {
     return {
-      msg: '',
       form: {
-        password: '',
-        username: ''
+        password: '123456',
+        username: 'admin'
+      },
+      rules: {
+        username: [
+          { required: true, message: '请输入3-10位用户名', trigger: 'blur' },
+          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入6-15位用户密码', trigger: 'blur' },
+          { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
+        ]
       }
     }
   },
   methods: {
     reset_handle() {
-      this.form.password = ''
-      this.form.username = ''
+      this.$refs.formRef.resetFields()
     },
     async sub_handle() {
-      const data = await axios.post('/login', this.form)
-      const { msg, status } = data.meta
-      const { token } = data.data
-      if (status !== 200) {
-        this.msg = msg
-        this.open4()
-      } else {
-        this.msg = msg
-        this.open2()
-        localStorage.setItem('token', token)
-        location.hash = '#/home'
-      }
-      this.reset_handle()
-    },
-    open2() {
-      this.$message({
-        showClose: true,
-        message: this.msg,
-        type: 'success'
-      })
-    },
-    open4() {
-      this.$message({
-        showClose: true,
-        message: this.msg,
-        type: 'error'
+      this.$refs.formRef.validate(async valid => {
+        if (!valid) return valid
+        if (valid) {
+          // 验证成功发送请求
+          const data = await this.$axios.post('/login', this.form)
+          const { msg, status } = data.meta
+          const { token } = data.data
+          if (status !== 200) {
+            return this.$message.error(msg)
+          }
+          if (status === 200) {
+            this.$message.success(msg)
+            localStorage.setItem('token', token)
+            this.$router.push('/home')
+          }
+        }
       })
     }
   }

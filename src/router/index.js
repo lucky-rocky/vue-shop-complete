@@ -13,5 +13,13 @@ const routes = [
 const router = new VueRouter({
   routes
 })
-
+// 路由导航
+router.beforeEach((to, form, next) => {
+  if (to.path === '/login') return next()
+  if (!localStorage.getItem('token')) {
+    alert('请先登录')
+    return next('/login')
+  }
+  next()
+})
 export default router
