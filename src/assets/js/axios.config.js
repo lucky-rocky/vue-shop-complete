@@ -15,7 +15,4 @@ axios.interceptors.response.use(res => {
   return data
 })
 
-export default {
-  axios
-}
 Vue.prototype.$axios = axios
