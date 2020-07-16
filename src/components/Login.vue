@@ -57,7 +57,7 @@ export default {
         this.msg = msg
         this.open2()
         localStorage.setItem('token', token)
-        location.hash = '#/users'
+        location.hash = '#/home'
       }
       this.reset_handle()
     },
