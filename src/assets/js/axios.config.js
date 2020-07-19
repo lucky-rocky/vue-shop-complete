@@ -7,6 +7,10 @@ axios.interceptors.request.use(config => {
   config.timeout = 4000
   config.timeoutErrorMessage = '请求超时'
   const token = localStorage.getItem('token')
+  if (!token && config.url !== '/login') {
+    Vue.prototype.$message.error('请重新登录')
+    location.hash = '/login'
+  }
   config.headers.Authorization = token
   return config
 })
