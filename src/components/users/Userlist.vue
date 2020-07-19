@@ -96,7 +96,7 @@
                       type="warning"
                       icon="el-icon-setting"
                       size="mini"
-                      @click="settingDialogVisible=true"
+                      @click="settingHandle(scope.row)"
                     ></el-button>
                   </el-tooltip>
                 </template>
@@ -155,29 +155,32 @@
       </template>
 
       <!-- 分配角色dialog -->
-      <!-- <template>
+      <template>
         <el-dialog
           title="分配角色"
           :visible.sync="settingDialogVisible"
           width="50%"
           :before-close="handleClose"
         >
-          <div>当前的用户:</div>
-          <div>当前的角色:</div>
+          <div>当前的用户:{{settingShowInfo.username}}</div>
+          <div>当前的角色:{{settingShowInfo.role_name}}</div>
           <div>
-            <el-form :model="rolesForm">
-              分配新角色:
-              <el-select placeholder="请选择">
-                <el-option :value="jkl"></el-option>
-              </el-select>
-            </el-form>
+            分配新角色:
+            <el-select v-model="value" placeholder="请选择">
+              <el-option
+                v-for="item in roleList"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id"
+              ></el-option>
+            </el-select>
           </div>
           <span slot="footer" class="dialog-footer">
             <el-button @click="settingDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="settingDialogVisible = false">确 定</el-button>
+            <el-button type="primary" @click="settingRoles(value)">确 定</el-button>
           </span>
         </el-dialog>
-      </template>-->
+      </template>
     </el-container>
   </div>
 </template>
@@ -194,6 +197,7 @@ export default {
       callback(new Error('请输入合法手机号'))
     }
     return {
+      value: '',
       settingDialogVisible: false,
       isEdit: false,
       dialogVisible: false,
@@ -227,8 +231,9 @@ export default {
           { required: true, message: '请输入手机号码', trigger: 'blur' },
           { validator: validateMobile, trigger: 'blur' }
         ]
-      }
-      //   rolesForm: { jlj: 'sljkfls' }
+      },
+      roleList: [],
+      settingShowInfo: {}
     }
   },
   methods: {
@@ -365,6 +370,55 @@ export default {
       //   console.log(status)
       if (status !== 200) return this.$message.error(msg)
       this.$message.success(msg)
+      // console.log(this.totalnum % this.paginationData.pagesize)
+      // console.log(this.paginationData.pagenum > 1)
+      if (
+        this.totalnum % this.paginationData.pagesize < 2 &&
+        this.paginationData.pagenum > 1
+      ) {
+        this.paginationData.pagenum -= 1
+        // console.log(this.paginationData.pagenum)
+      }
+      if (
+        this.totalnum % this.paginationData.pagesize === 0 &&
+        this.paginationData.pagenum > 1
+      ) {
+        this.paginationData.pagenum += 1
+      }
+      // console.log(this.paginationData.pagenum)
+      this.queryUserlist()
+    },
+    /* 打开分配角色弹框 */
+    async settingHandle(v) {
+      this.settingShowInfo = v
+      // console.log(this.settingShowInfo)
+      this.settingDialogVisible = true
+      const {
+        data,
+        meta: { msg, status }
+      } = await this.$axios.get('roles')
+      // console.log(res)
+      if (status !== 200) {
+        return this.$message.error(msg)
+      }
+      this.roleList = data
+      // console.log(this.roleList)
+    },
+    /* 分配角色 */
+    async settingRoles(v) {
+      const userId = this.settingShowInfo.id
+      // v为角色id
+      // console.log(v)
+      const {
+        meta: { msg, status }
+      } = await this.$axios.put(`users/${userId}/role`, {
+        rid: v
+      })
+      if (status !== 200) {
+        return this.$message.error(msg)
+      }
+      this.$message.success(msg)
+      this.settingDialogVisible = false
       this.queryUserlist()
     }
   },

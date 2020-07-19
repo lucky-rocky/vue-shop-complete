@@ -150,6 +150,7 @@ export default {
   .main {
     padding: 0;
     border: none;
+    background-color: #ccc;
   }
   .open_close {
     background-color: #495163;
