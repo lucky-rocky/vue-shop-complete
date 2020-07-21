@@ -161,12 +161,13 @@
           :visible.sync="settingDialogVisible"
           width="50%"
           :before-close="handleClose"
+          @close="settingDialogCloseHandle"
         >
           <div>当前的用户:{{settingShowInfo.username}}</div>
           <div>当前的角色:{{settingShowInfo.role_name}}</div>
           <div>
             分配新角色:
-            <el-select v-model="value" placeholder="请选择">
+            <el-select v-model="selectValue" placeholder="请选择">
               <el-option
                 v-for="item in roleList"
                 :key="item.id"
@@ -177,7 +178,7 @@
           </div>
           <span slot="footer" class="dialog-footer">
             <el-button @click="settingDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="settingRoles(value)">确 定</el-button>
+            <el-button type="primary" @click="settingRoles()">确 定</el-button>
           </span>
         </el-dialog>
       </template>
@@ -233,7 +234,8 @@ export default {
         ]
       },
       roleList: [],
-      settingShowInfo: {}
+      settingShowInfo: {},
+      selectValue: ''
     }
   },
   methods: {
@@ -296,6 +298,10 @@ export default {
     /* 对话框关闭的回调 */
     dialogClose() {
       this.$refs.addFormRef.resetFields()
+    },
+    /* 配置角色对话框关闭的回调 */
+    settingDialogCloseHandle() {
+      this.selectValue = ''
     },
     /* 添加新用户或者编辑后提交 */
     addAndEditUser(v) {
@@ -405,14 +411,14 @@ export default {
       // console.log(this.roleList)
     },
     /* 分配角色 */
-    async settingRoles(v) {
+    async settingRoles() {
       const userId = this.settingShowInfo.id
       // v为角色id
       // console.log(v)
       const {
         meta: { msg, status }
       } = await this.$axios.put(`users/${userId}/role`, {
-        rid: v
+        rid: this.selectValue
       })
       if (status !== 200) {
         return this.$message.error(msg)
