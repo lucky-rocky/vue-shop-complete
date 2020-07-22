@@ -93,7 +93,7 @@
             </el-form-item>
             <el-form-item label="父级分类" v-if="!isEdit">
               <el-cascader
-                :v-model="value"
+                v-model="selectedKeys"
                 :options="addCateCascaderList"
                 :props="props"
                 @change="handleChange"
@@ -163,7 +163,6 @@ export default {
         value: 'cat_id',
         children: 'children'
       },
-      value: '',
       // 级联被选中的父id数组
       selectedKeys: [],
       isEdit: false,
@@ -185,7 +184,8 @@ export default {
       this.$refs.ruleForm.resetFields()
       // 清空keys
       this.selectedKeys = []
-      this.addCateCascaderList = []
+      this.ruleForm.cat_pid = 0
+      this.ruleForm.cat_level = 0
     },
     // 获取商品分类
     async getGoodsList() {
@@ -230,7 +230,7 @@ export default {
     handleChange(value) {
       console.log(value)
       // 改变选择的id数组
-      this.selectedKeys = value
+      //   this.selectedKeys = value
       // console.log(this.selectedKeys)
     },
     // 添加商品分类
@@ -253,6 +253,7 @@ export default {
           this.getGoodsList()
           return true
         }
+        // 添加操作
         const addInfo = {
           cat_pid:
             this.selectedKeys.length > 0
