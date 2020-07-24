@@ -26,8 +26,22 @@
           <el-table-column prop="goods_weight" label="商品重量"></el-table-column>
           <el-table-column prop="add_time" label="创建时间" width="160px"></el-table-column>
           <el-table-column label="操作">
-            <el-button type="primary" icon="el-icon-edit" circle size="mini"></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle size="mini"></el-button>
+            <template slot-scope="scope">
+              <el-button
+                type="primary"
+                icon="el-icon-edit"
+                circle
+                size="mini"
+                @click="handleEdit(scope.row.goods_id)"
+              ></el-button>
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                circle
+                size="mini"
+                @click="handleDelete(scope.row.goods_id)"
+              ></el-button>
+            </template>
           </el-table-column>
         </el-table>
       </template>
@@ -100,6 +114,31 @@ export default {
     /* 点击添加商品,跳转到添加商品页面 */
     toAddGood() {
       this.$router.push('/addgood')
+    },
+
+    // 编辑
+    async handleEdit(id) {
+      const {
+        data,
+        meta: { msg, status }
+      } = await this.$axios.get(`goods/${id}`)
+      if (status !== 200) {
+        return this.$message.error(msg)
+      }
+      this.$message.success(msg)
+      console.log(data)
+    },
+
+    // 删除
+    async handleDelete(id) {
+      const {
+        meta: { msg, status }
+      } = await this.$axios.delete(`goods/${id}`)
+      if (status !== 200) {
+        return this.$message.error(msg)
+      }
+      this.$message.success(msg)
+      this.getGoodsList()
     }
   },
   created() {
