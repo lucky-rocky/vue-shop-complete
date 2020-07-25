@@ -63,8 +63,8 @@
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="商品参数" name="2">
-          <div v-for="item in manyParams" :key="item.attr_id" class="attr_name">
-            <div class="attr_div">{{item.attr_name}}</div>
+          <!-- <div v-for="item in manyParams" :key="item.attr_id" class="attr_name"> -->
+          <!-- <div class="attr_div">{{item.attr_name}}</div>
             <span v-for="(item2,index2) in item.attr_vals" :key="index2" class="attr_vals">
               <el-button
                 class="tagColor"
@@ -73,6 +73,18 @@
                 @click="tagClick(item.attr_vals,index2)"
               >{{item2}}</el-button>
             </span>
+          </div>-->
+          <div v-for="item in manyParams" :key="item.attr_id" class="attr_name">
+            <div>{{item.attr_name}}</div>
+            <el-checkbox-group v-model="item.attr_vals" size="small" checked>
+              <el-checkbox
+                :label="item2"
+                border
+                v-for="(item2,index2) in item.attr_vals"
+                :key="index2"
+                class="attr_vals"
+              ></el-checkbox>
+            </el-checkbox-group>
           </div>
         </el-tab-pane>
         <el-tab-pane label="商品属性" name="3">
